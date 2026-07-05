@@ -16,7 +16,7 @@ export const translations = {
     financialTitle: "Finans & Trading Çözümleri",
     financialDesc: "MT4 ve MT5 için Expert Advisor (EA) yazılımları, Borsa ve FX piyasaları için gelişmiş al/sat robotları ve algoritmik ticaret sistemleri.",
     enterpriseTitle: "Kurumsal Muhasebe & ERP",
-    enterpriseDesc: "Şirketinizin finansal süreçlerini kolaylaştıten, raporlama ve takip yetenekleri gelişmiş muhasebe programları ve ERP yazılımları.",
+    enterpriseDesc: "Şirketinizin finansal süreçlerini kolaylaştıran, raporlama ve takip yetenekleri gelişmiş muhasebe programları ve ERP yazılımları.",
     customTitle: "Firmaya Özel Programlar",
     customDesc: "İş süreçlerinize, iş akışınıza ve departman ihtiyaçlarınıza göre sıfırdan tasarlanan özel masaüstü, web ve mobil yazılımları.",
     aiTitle: "Yapay Zeka Entegrasyonları",
