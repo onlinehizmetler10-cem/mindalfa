@@ -9,6 +9,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
     description: "",
   });
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
@@ -20,7 +21,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Basic validation
@@ -37,29 +38,65 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
       return;
     }
 
-    // Submit
-    onSubmit({
-      id: Date.now().toString(),
-      ...formData,
-      status: "new",
-      date: new Date().toLocaleString(lang === "tr" ? "tr-TR" : "en-US"),
-    });
-
-    // Reset form
-    setFormData({
-      name: "",
-      surname: "",
-      phone: "",
-      email: "",
-      description: "",
-    });
+    setIsSubmitting(true);
     setError("");
+
+    try {
+      // Access key can be defined in .env as VITE_WEB3FORMS_KEY
+      const apiKey = import.meta.env.VITE_WEB3FORMS_KEY || "YOUR_ACCESS_KEY_HERE";
+      
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: apiKey,
+          name: `${name} ${surname}`,
+          email: email,
+          phone: phone,
+          message: description,
+          subject: `Yeni Proje Talebi - ${name} ${surname}`,
+          from_name: "MindAlfa Web Portal",
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Trigger parent state update (saves to local list)
+        onSubmit({
+          id: Date.now().toString(),
+          ...formData,
+          status: "new",
+          date: new Date().toLocaleString(lang === "tr" ? "tr-TR" : "en-US"),
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          surname: "",
+          phone: "",
+          email: "",
+          description: "",
+        });
+        setError("");
+      } else {
+        setError(lang === "tr" ? "Gönderim başarısız oldu. Lütfen tekrar deneyin." : "Failed to send. Please try again.");
+      }
+    } catch (err) {
+      console.error("Web3Forms API error:", err);
+      setError(lang === "tr" ? "Bir bağlantı hatası oluştu. Lütfen internetinizi kontrol edin." : "A connection error occurred. Please check your network.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={isSubmitting ? null : onClose}>
       <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
+        <button className="modal-close-btn" onClick={onClose} disabled={isSubmitting}>
           &times;
         </button>
         
@@ -79,6 +116,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
                 placeholder={lang === "tr" ? "Örn. Ahmet" : "e.g. John"}
               />
             </div>
@@ -92,6 +130,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
                 value={formData.surname}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
                 placeholder={lang === "tr" ? "Örn. Yılmaz" : "e.g. Doe"}
               />
             </div>
@@ -107,6 +146,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
                 placeholder={lang === "tr" ? "Örn. 05551234567" : "e.g. +15551234567"}
               />
             </div>
@@ -120,6 +160,7 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
                 placeholder="name@example.com"
               />
             </div>
@@ -134,16 +175,17 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
               value={formData.description}
               onChange={handleChange}
               required
+              disabled={isSubmitting}
               placeholder={t.fieldDescriptionPlaceholder}
             ></textarea>
           </div>
 
           <div className="form-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+            <button type="button" className="btn-secondary" onClick={onClose} disabled={isSubmitting}>
               {t.btnClose}
             </button>
-            <button type="submit" className="btn-primary">
-              {t.btnSend}
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? (lang === "tr" ? "Gönderiliyor..." : "Sending...") : t.btnSend}
             </button>
           </div>
         </form>
