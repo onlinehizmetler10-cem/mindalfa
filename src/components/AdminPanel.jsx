@@ -38,7 +38,9 @@ export default function AdminPanel({ requests, onUpdateStatus, onDeleteRequest, 
     <div className="admin-container">
       <header className="admin-header">
         <div>
-          <h1 className="gradient-text">{t.adminTitle}</h1>
+          <h1 className="gradient-text">
+            <span className="brand-font">MindAlfa</span> {lang === "tr" ? "Talep Yönetim Paneli" : "Request Management Panel"}
+          </h1>
           <p className="admin-subtitle">{t.adminSubtitle}</p>
         </div>
         <button className="btn-secondary" onClick={onBack}>
