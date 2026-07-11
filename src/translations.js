@@ -1,6 +1,6 @@
 export const translations = {
   tr: {
-    brandName: "MindAlfa",
+    brandName: "MINDALFA",
     navAbout: "Biz Kimiz?",
     navServices: "Hizmetlerimiz",
     navSupport: "Destek & Eğitim",
@@ -79,7 +79,7 @@ export const translations = {
     adminLoginTip: "Test Giriş Bilgileri:"
   },
   en: {
-    brandName: "MindAlfa",
+    brandName: "MINDALFA",
     navAbout: "Who We Are",
     navServices: "Services",
     navSupport: "Support & Training",

@@ -39,7 +39,7 @@ export default function AdminPanel({ requests, onUpdateStatus, onDeleteRequest, 
       <header className="admin-header">
         <div>
           <h1 className="gradient-text">
-            <span className="brand-font">MindAlfa</span> {lang === "tr" ? "Talep Yönetim Paneli" : "Request Management Panel"}
+            <span className="brand-font">MINDALFA</span> {lang === "tr" ? "Talep Yönetim Paneli" : "Request Management Panel"}
           </h1>
           <p className="admin-subtitle">{t.adminSubtitle}</p>
         </div>
