@@ -137,7 +137,7 @@ export default function LandingPage({ onOpenRequest, t }) {
         <div className="welcome-glow"></div>
         <div className="welcome-content">
           <img src={logoImg} alt="MindAlfa Logo" className="welcome-logo" />
-          <h1 className="welcome-brand gradient-text">MINDALFA</h1>
+          <h1 className="welcome-brand gradient-text" data-text="MINDALFA">MINDALFA</h1>
           <p className="welcome-tagline">{t.tagline}</p>
           <div className="scroll-indicator" onClick={scrollToAbout}>
             <span className="scroll-arrow">↓</span>
