@@ -142,7 +142,7 @@ export default function App() {
             <div className="container nav-content">
               <div className="logo" onClick={(e) => handleNavClick(e, "welcome")}>
                 <img src={logoImg} alt="MindAlfa Logo" className="logo-img" />
-                <span className="logo-text">{t.brandName}</span>
+                <span className="logo-text gradient-text">{t.brandName}</span>
               </div>
 
               <div className="nav-links">
