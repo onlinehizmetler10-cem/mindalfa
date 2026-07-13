@@ -82,7 +82,9 @@ export default function App() {
   const [defaultFormDesc, setDefaultFormDesc] = useState("");
   const [view, setView] = useState("landing"); // "landing" or "admin"
   const [alertMessage, setAlertMessage] = useState("");
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    return sessionStorage.getItem("mindalfa_admin_logged_in") === "true";
+  });
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -96,12 +98,19 @@ export default function App() {
 
     if (loginEmail === adminEmail && loginPassword === adminPassword) {
       setIsAdminLoggedIn(true);
+      sessionStorage.setItem("mindalfa_admin_logged_in", "true");
       setLoginError("");
       setLoginEmail("");
       setLoginPassword("");
     } else {
       setLoginError(t.adminLoginError);
     }
+  };
+
+  const handleLogout = () => {
+    setIsAdminLoggedIn(false);
+    sessionStorage.removeItem("mindalfa_admin_logged_in");
+    setView("landing");
   };
 
   const handleNavClick = (e, sectionId) => {
@@ -261,10 +270,8 @@ export default function App() {
             onEditProduct={handleEditProduct}
             onDeleteProduct={handleDeleteProduct}
             onReorderProducts={saveProducts}
-            onBack={() => {
-              setView("landing");
-              setIsAdminLoggedIn(false); // Reset login status for demonstration
-            }} 
+            onBack={() => setView("landing")}
+            onLogout={handleLogout}
             lang={lang} 
             t={t} 
           />

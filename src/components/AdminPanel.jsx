@@ -10,6 +10,7 @@ export default function AdminPanel({
   onDeleteProduct, 
   onReorderProducts,
   onBack, 
+  onLogout,
   lang, 
   t 
 }) {
@@ -221,9 +222,14 @@ export default function AdminPanel({
           </h1>
           <p className="admin-subtitle">{t.adminSubtitle}</p>
         </div>
-        <button className="btn-secondary" onClick={onBack}>
-          &larr; {t.adminBackToSite}
-        </button>
+        <div className="admin-header-actions" style={{ display: "flex", gap: "10px" }}>
+          <button className="btn-secondary" onClick={onBack}>
+            &larr; {t.adminBackToSite}
+          </button>
+          <button className="btn-danger" onClick={onLogout} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            🔒 {lang === "tr" ? "Çıkış Yap" : "Log Out"}
+          </button>
+        </div>
       </header>
 
       {/* Tab Switcher */}
