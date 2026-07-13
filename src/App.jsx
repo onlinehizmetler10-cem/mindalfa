@@ -39,10 +39,37 @@ const initialMockRequests = [
   }
 ];
 
+// Mock products to prepopulate the catalog with premium items
+const initialMockProducts = [
+  {
+    id: "p1",
+    name: "MindAlfa Algo-Grid EA (MT5)",
+    price: "499 $",
+    description: "MetaTrader 5 üzerinde çalışan, akıllı RSI & Grid algoritmasına sahip, dinamik SL/TP yönetimi yapan tam otomatik forex robotu.",
+    image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><circle cx="150" cy="90" r="50" fill="none" stroke="%2300f0ff" stroke-width="3" stroke-dasharray="8 4"/><path d="M120 90 L140 70 L160 110 L180 90" fill="none" stroke="%238b5cf6" stroke-width="4"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">GRID EA BOT</text></svg>`
+  },
+  {
+    id: "p2",
+    name: "MindAlfa AI-Ledger (ERP Connect)",
+    price: "1.200 $",
+    description: "Şirketinizin tüm fatura ve finansal verilerini yapay zeka ile sınıflandıran, otomatik rapor oluşturan akıllı ERP/Muhasebe modülü.",
+    image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><rect x="110" y="50" width="80" height="80" rx="10" fill="none" stroke="%238b5cf6" stroke-width="3"/><path d="M130 90 L170 90 M130 75 L170 75 M130 105 L155 105" fill="none" stroke="%2300f0ff" stroke-width="3"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">AI LEDGER API</text></svg>`
+  },
+  {
+    id: "p3",
+    name: "MindAlfa Custom API Suite",
+    price: "Fiyat Teklifi Alın",
+    description: "İş süreçlerinize özel olarak tasarlanan, yüksek hızlı, güvenli ve ölçeklenebilir backend API entegrasyonu ve yönetim sistemi.",
+    image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><path d="M100 90 L130 60 L100 30 M200 90 L170 60 L200 30 M160 30 L140 90" fill="none" stroke="%2300f0ff" stroke-width="3" transform="translate(0, 30)"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">CUSTOM API SUITE</text></svg>`
+  }
+];
+
 export default function App() {
   const [lang, setLang] = useState("tr");
   const [requests, setRequests] = useState([]);
+  const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [defaultFormDesc, setDefaultFormDesc] = useState("");
   const [view, setView] = useState("landing"); // "landing" or "admin"
   const [alertMessage, setAlertMessage] = useState("");
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -79,7 +106,7 @@ export default function App() {
     }
   };
 
-  // Load requests from localStorage
+  // Load requests & products from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("mindalfa_requests");
     if (saved) {
@@ -87,6 +114,14 @@ export default function App() {
     } else {
       setRequests(initialMockRequests);
       localStorage.setItem("mindalfa_requests", JSON.stringify(initialMockRequests));
+    }
+
+    const savedProds = localStorage.getItem("mindalfa_products");
+    if (savedProds) {
+      setProducts(JSON.parse(savedProds));
+    } else {
+      setProducts(initialMockProducts);
+      localStorage.setItem("mindalfa_products", JSON.stringify(initialMockProducts));
     }
   }, []);
 
@@ -96,10 +131,17 @@ export default function App() {
     localStorage.setItem("mindalfa_requests", JSON.stringify(updatedList));
   };
 
+  // Save products to localStorage when updated
+  const saveProducts = (updatedList) => {
+    setProducts(updatedList);
+    localStorage.setItem("mindalfa_products", JSON.stringify(updatedList));
+  };
+
   const handleAddRequest = (newRequest) => {
     const updated = [newRequest, ...requests];
     saveRequests(updated);
     setIsModalOpen(false);
+    setDefaultFormDesc("");
     
     // Trigger custom success notification
     setAlertMessage(t.successAlert);
@@ -123,6 +165,41 @@ export default function App() {
       const updated = requests.filter(req => req.id !== id);
       saveRequests(updated);
     }
+  };
+
+  // Product CRUD Handlers
+  const handleAddProduct = (newProd) => {
+    const updated = [newProd, ...products];
+    saveProducts(updated);
+  };
+
+  const handleEditProduct = (updatedProd) => {
+    const updated = products.map(prod =>
+      prod.id === updatedProd.id ? updatedProd : prod
+    );
+    saveProducts(updated);
+  };
+
+  const handleDeleteProduct = (id) => {
+    const confirmDelete = window.confirm(
+      lang === "tr"
+        ? "Bu ürünü satılık listesinden silmek istediğinize emin misiniz?"
+        : "Are you sure you want to delete this product from sale?"
+    );
+    if (confirmDelete) {
+      const updated = products.filter(prod => prod.id !== id);
+      saveProducts(updated);
+    }
+  };
+
+  // Pre-fill form details with product request info
+  const handleOpenRequestWithProduct = (productName) => {
+    setDefaultFormDesc(
+      lang === "tr"
+        ? `"${productName}" ürününüz hakkında detaylı bilgi almak ve satın alma sürecini başlatmak istiyorum.`
+        : `I would like to get detailed information about your "${productName}" product and start the purchase process.`
+    );
+    setIsModalOpen(true);
   };
 
   return (
@@ -151,6 +228,7 @@ export default function App() {
               <div className="nav-links">
                 <a href="#about" onClick={(e) => handleNavClick(e, "about")} className="nav-link">{t.navAbout}</a>
                 <a href="#services" onClick={(e) => handleNavClick(e, "services")} className="nav-link">{t.navServices}</a>
+                <a href="#products" onClick={(e) => handleNavClick(e, "products")} className="nav-link">{t.navProducts}</a>
                 <a href="#support" onClick={(e) => handleNavClick(e, "support")} className="nav-link">{t.navSupport}</a>
               </div>
               
@@ -176,7 +254,7 @@ export default function App() {
                 <button 
                   id="submit-request-btn"
                   className="btn-primary" 
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => { setDefaultFormDesc(""); setIsModalOpen(true); }}
                 >
                   {t.ctaSubmitRequest}
                 </button>
@@ -186,7 +264,9 @@ export default function App() {
 
           {/* Main Landing View */}
           <LandingPage 
-            onOpenRequest={() => setIsModalOpen(true)} 
+            products={products}
+            onOpenRequest={() => { setDefaultFormDesc(""); setIsModalOpen(true); }} 
+            onOpenRequestWithProduct={handleOpenRequestWithProduct}
             lang={lang} 
             t={t} 
           />
@@ -194,8 +274,9 @@ export default function App() {
           {/* Request Form Modal */}
           <RequestForm 
             isOpen={isModalOpen} 
-            onClose={() => setIsModalOpen(false)} 
+            onClose={() => { setIsModalOpen(false); setDefaultFormDesc(""); }} 
             onSubmit={handleAddRequest} 
+            defaultDesc={defaultFormDesc}
             lang={lang} 
             t={t} 
           />
@@ -205,8 +286,12 @@ export default function App() {
         isAdminLoggedIn ? (
           <AdminPanel 
             requests={requests} 
+            products={products}
             onUpdateStatus={handleUpdateStatus} 
             onDeleteRequest={handleDeleteRequest} 
+            onAddProduct={handleAddProduct}
+            onEditProduct={handleEditProduct}
+            onDeleteProduct={handleDeleteProduct}
             onBack={() => {
               setView("landing");
               setIsAdminLoggedIn(false); // Reset login status for demonstration

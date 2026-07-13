@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
+export default function RequestForm({ isOpen, onClose, onSubmit, lang, t, defaultDesc }) {
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -10,6 +10,15 @@ export default function RequestForm({ isOpen, onClose, onSubmit, lang, t }) {
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        description: defaultDesc || "",
+      }));
+    }
+  }, [isOpen, defaultDesc]);
 
   if (!isOpen) return null;
 

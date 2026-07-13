@@ -76,7 +76,26 @@ export const translations = {
     adminPasswordLabel: "Şifre",
     adminLoginBtn: "Giriş Yap",
     adminLoginError: "E-posta veya şifre hatalı!",
-    adminLoginTip: "Test Giriş Bilgileri:"
+    adminLoginTip: "Test Giriş Bilgileri:",
+
+    // Products Section
+    navProducts: "Ürünlerimiz",
+    productsTitle: "Satıştaki Ürünlerimiz",
+    productsSubtitle: "Geliştirdiğimiz lisanslı finansal robotlar ve yapay zeka modüllerini buradan satın alabilir veya bilgi alabilirsiniz.",
+    btnGetInfo: "Bilgi Al / Satın Al",
+    adminTabProducts: "Ürün Yönetimi",
+    adminTabRequests: "Talepler",
+    adminAddProduct: "Yeni Ürün Ekle",
+    adminEditProduct: "Ürünü Düzenle",
+    adminNoProducts: "Henüz satılık ürün eklenmemiş.",
+    adminProductName: "Ürün Adı",
+    adminProductPrice: "Fiyat",
+    adminProductDesc: "Açıklama",
+    adminProductImage: "Görsel",
+    adminProductActions: "İşlemler",
+    adminSelectFile: "Görsel Seç",
+    adminPricePlaceholder: "Örn. 500 $ veya 15.000 TL",
+    adminValidationProductError: "Lütfen ürün adı, açıklaması ve fiyatı alanlarını doldurun."
   },
   en: {
     brandName: "MINDALFA",
@@ -155,6 +174,25 @@ export const translations = {
     adminPasswordLabel: "Password",
     adminLoginBtn: "Log In",
     adminLoginError: "Invalid email or password!",
-    adminLoginTip: "Test Credentials:"
+    adminLoginTip: "Test Credentials:",
+
+    // Products Section
+    navProducts: "Products",
+    productsTitle: "Products For Sale",
+    productsSubtitle: "Browse and purchase our licensed trading robots and artificial intelligence modules.",
+    btnGetInfo: "Get Details / Buy",
+    adminTabProducts: "Product Management",
+    adminTabRequests: "Requests",
+    adminAddProduct: "Add New Product",
+    adminEditProduct: "Edit Product",
+    adminNoProducts: "No products added for sale yet.",
+    adminProductName: "Product Name",
+    adminProductPrice: "Price",
+    adminProductDesc: "Description",
+    adminProductImage: "Image",
+    adminProductActions: "Actions",
+    adminSelectFile: "Choose Image",
+    adminPricePlaceholder: "e.g. $500 or 15,000 TL",
+    adminValidationProductError: "Please fill out product name, description, and price fields."
   }
 };

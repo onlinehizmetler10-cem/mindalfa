@@ -55,7 +55,7 @@ def get_ledger(company_id: int, db: Session = Depends(get_db)):
     return {"status": "success", "data": transactions}`
 ];
 
-export default function LandingPage({ onOpenRequest, t }) {
+export default function LandingPage({ onOpenRequest, products = [], onOpenRequestWithProduct, lang, t }) {
   const [promptIdx, setPromptIdx] = useState(0);
   const [status, setStatus] = useState("idle"); // idle -> typing_prompt -> thinking -> writing_code -> done
   const [typedPrompt, setTypedPrompt] = useState("");
@@ -273,6 +273,43 @@ export default function LandingPage({ onOpenRequest, t }) {
               <li>&gt; Smart decision triggers</li>
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* Satıştaki Ürünlerimiz Section */}
+      <section id="products" className="products-section container">
+        <div className="section-header text-center">
+          <h2 className="gradient-text">{t.productsTitle}</h2>
+          <p className="section-subtitle">{t.productsSubtitle}</p>
+        </div>
+
+        <div className="products-grid">
+          {products.length === 0 ? (
+            <div className="no-products glass text-center">
+              <p>{t.adminNoProducts}</p>
+            </div>
+          ) : (
+            products.map((product) => (
+              <div key={product.id} className="product-card glass">
+                <div className="product-image-container">
+                  <img src={product.image} alt={product.name} className="product-image" />
+                </div>
+                <div className="product-info">
+                  <h3 className="product-name">{product.name}</h3>
+                  <p className="product-desc">{product.description}</p>
+                  <div className="product-footer">
+                    <span className="product-price text-primary">{product.price}</span>
+                    <button 
+                      className="btn-primary" 
+                      onClick={() => onOpenRequestWithProduct(product.name)}
+                    >
+                      {t.btnGetInfo}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
