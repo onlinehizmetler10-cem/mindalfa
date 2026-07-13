@@ -253,12 +253,7 @@ export default function App() {
                   </button>
                 </div>
               </form>
-              
-              <div className="login-tip font-mono">
-                <span className="text-accent">{t.adminLoginTip}</span>
-                <div>Email: <span className="text-primary">admin@mindalfa.com</span></div>
-                <div>Pass: <span className="text-primary">admin</span></div>
-              </div>
+
             </div>
           </div>
         )
