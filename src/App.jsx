@@ -54,7 +54,10 @@ export default function App() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (loginEmail === "admin@mindalfa.com" && loginPassword === "admin") {
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || "admin@mindalfa.com";
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin";
+
+    if (loginEmail === adminEmail && loginPassword === adminPassword) {
       setIsAdminLoggedIn(true);
       setLoginError("");
       setLoginEmail("");
