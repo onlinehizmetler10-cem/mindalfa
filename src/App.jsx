@@ -44,23 +44,32 @@ const initialMockRequests = [
 const initialMockProducts = [
   {
     id: "p1",
-    name: "MindAlfa Algo-Grid EA (MT5)",
-    price: "499 $",
-    description: "MetaTrader 5 üzerinde çalışan, akıllı RSI & Grid algoritmasına sahip, dinamik SL/TP yönetimi yapan tam otomatik forex robotu.",
+    name_tr: "MindAlfa Algo-Grid EA (MT5)",
+    name_en: "MindAlfa Algo-Grid EA (MT5)",
+    price_tr: "499 $",
+    price_en: "499 $",
+    description_tr: "MetaTrader 5 üzerinde çalışan, akıllı RSI & Grid algoritmasına sahip, dinamik SL/TP yönetimi yapan tam otomatik forex robotu.",
+    description_en: "An automated forex trading robot for MetaTrader 5, featuring a smart RSI & Grid algorithm with dynamic SL/TP management.",
     image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><circle cx="150" cy="90" r="50" fill="none" stroke="%2300f0ff" stroke-width="3" stroke-dasharray="8 4"/><path d="M120 90 L140 70 L160 110 L180 90" fill="none" stroke="%238b5cf6" stroke-width="4"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">GRID EA BOT</text></svg>`
   },
   {
     id: "p2",
-    name: "MindAlfa AI-Ledger (ERP Connect)",
-    price: "1.200 $",
-    description: "Şirketinizin tüm fatura ve finansal verilerini yapay zeka ile sınıflandıran, otomatik rapor oluşturan akıllı ERP/Muhasebe modülü.",
+    name_tr: "MindAlfa AI-Ledger (ERP Connect)",
+    name_en: "MindAlfa AI-Ledger (ERP Connect)",
+    price_tr: "1.200 $",
+    price_en: "1,200 $",
+    description_tr: "Şirketinizin tüm fatura ve finansal verilerini yapay zeka ile sınıflandıran, otomatik rapor oluşturan akıllı ERP/Muhasebe modülü.",
+    description_en: "A smart ERP/accounting module that classifies your business invoices and financial data using AI, generating automated reports.",
     image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><rect x="110" y="50" width="80" height="80" rx="10" fill="none" stroke="%238b5cf6" stroke-width="3"/><path d="M130 90 L170 90 M130 75 L170 75 M130 105 L155 105" fill="none" stroke="%2300f0ff" stroke-width="3"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">AI LEDGER API</text></svg>`
   },
   {
     id: "p3",
-    name: "MindAlfa Custom API Suite",
-    price: "Fiyat Teklifi Alın",
-    description: "İş süreçlerinize özel olarak tasarlanan, yüksek hızlı, güvenli ve ölçeklenebilir backend API entegrasyonu ve yönetim sistemi.",
+    name_tr: "MindAlfa Custom API Suite",
+    name_en: "MindAlfa Custom API Suite",
+    price_tr: "Fiyat Teklifi Alın",
+    price_en: "Get a Quote",
+    description_tr: "İş süreçlerinize özel olarak tasarlanan, yüksek hızlı, güvenli ve ölçeklenebilir backend API entegrasyonu ve yönetim sistemi.",
+    description_en: "A high-speed, secure, and scalable backend API integration and management system custom-designed for your business workflows.",
     image: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><path d="M100 90 L130 60 L100 30 M200 90 L170 60 L200 30 M160 30 L140 90" fill="none" stroke="%2300f0ff" stroke-width="3" transform="translate(0, 30)"/><text x="50%25" y="170" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="%23ffffff">CUSTOM API SUITE</text></svg>`
   }
 ];
@@ -119,7 +128,31 @@ export default function App() {
 
     const savedProds = localStorage.getItem("mindalfa_products");
     if (savedProds) {
-      setProducts(JSON.parse(savedProds));
+      try {
+        const parsed = JSON.parse(savedProds);
+        // Check if any product has the old schema (has "name" instead of "name_tr")
+        const hasOldSchema = parsed.some(prod => prod.name !== undefined);
+        if (hasOldSchema) {
+          // Migrate old products to new schema
+          const migrated = parsed.map(prod => ({
+            id: prod.id,
+            name_tr: prod.name_tr || prod.name || "",
+            name_en: prod.name_en || prod.name || "",
+            price_tr: prod.price_tr || prod.price || "",
+            price_en: prod.price_en || prod.price || "",
+            description_tr: prod.description_tr || prod.description || "",
+            description_en: prod.description_en || prod.description || "",
+            image: prod.image || ""
+          }));
+          setProducts(migrated);
+          localStorage.setItem("mindalfa_products", JSON.stringify(migrated));
+        } else {
+          setProducts(parsed);
+        }
+      } catch (err) {
+        setProducts(initialMockProducts);
+        localStorage.setItem("mindalfa_products", JSON.stringify(initialMockProducts));
+      }
     } else {
       setProducts(initialMockProducts);
       localStorage.setItem("mindalfa_products", JSON.stringify(initialMockProducts));

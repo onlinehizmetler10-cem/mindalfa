@@ -17,26 +17,32 @@ export default function ProductsCatalog({ products, onOpenRequestWithProduct, on
       </header>
 
       <div className="products-grid">
-        {products.map((product) => (
-          <div key={product.id} className="product-card glass">
-            <div className="product-image-container">
-              <img src={product.image} alt={product.name} className="product-image" />
-            </div>
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p className="product-desc">{product.description}</p>
-              <div className="product-footer">
-                <span className="product-price text-primary">{product.price}</span>
-                <button 
-                  className="btn-primary" 
-                  onClick={() => onOpenRequestWithProduct(product.name)}
-                >
-                  {t.btnGetInfo}
-                </button>
+        {products.map((product) => {
+          const name = lang === "tr" ? product.name_tr : product.name_en || product.name_tr;
+          const desc = lang === "tr" ? product.description_tr : product.description_en || product.description_tr;
+          const price = lang === "tr" ? product.price_tr : product.price_en || product.price_tr;
+
+          return (
+            <div key={product.id} className="product-card glass">
+              <div className="product-image-container">
+                <img src={product.image} alt={name} className="product-image" />
+              </div>
+              <div className="product-info">
+                <h3 className="product-name">{name}</h3>
+                <p className="product-desc">{desc}</p>
+                <div className="product-footer">
+                  <span className="product-price text-primary">{price}</span>
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => onOpenRequestWithProduct(name)}
+                  >
+                    {t.btnGetInfo}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Catalog Footer */}

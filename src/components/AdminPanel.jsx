@@ -24,9 +24,12 @@ export default function AdminPanel({
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({
-    name: "",
-    price: "",
-    description: "",
+    name_tr: "",
+    name_en: "",
+    price_tr: "",
+    price_en: "",
+    description_tr: "",
+    description_en: "",
     image: ""
   });
   const [productError, setProductError] = useState("");
@@ -137,7 +140,15 @@ export default function AdminPanel({
 
   const handleOpenAddModal = () => {
     setEditingProduct(null);
-    setProductForm({ name: "", price: "", description: "", image: "" });
+    setProductForm({ 
+      name_tr: "", 
+      name_en: "", 
+      price_tr: "", 
+      price_en: "", 
+      description_tr: "", 
+      description_en: "", 
+      image: "" 
+    });
     setProductError("");
     setIsProductModalOpen(true);
   };
@@ -145,10 +156,13 @@ export default function AdminPanel({
   const handleOpenEditModal = (product) => {
     setEditingProduct(product);
     setProductForm({ 
-      name: product.name, 
-      price: product.price, 
-      description: product.description, 
-      image: product.image 
+      name_tr: product.name_tr || "", 
+      name_en: product.name_en || "", 
+      price_tr: product.price_tr || "", 
+      price_en: product.price_en || "", 
+      description_tr: product.description_tr || "", 
+      description_en: product.description_en || "", 
+      image: product.image || ""
     });
     setProductError("");
     setIsProductModalOpen(true);
@@ -156,12 +170,17 @@ export default function AdminPanel({
 
   const handleProductSubmit = (e) => {
     e.preventDefault();
-    const { name, price, description, image } = productForm;
+    const { name_tr, name_en, price_tr, price_en, description_tr, description_en, image } = productForm;
 
-    if (!name.trim() || !price.trim() || !description.trim()) {
+    if (!name_tr.trim() || !price_tr.trim() || !description_tr.trim()) {
       setProductError(t.adminValidationProductError);
       return;
     }
+
+    // Dynamic fallbacks: if English is not provided, use the Turkish text
+    const finalNameEn = name_en.trim() || name_tr.trim();
+    const finalPriceEn = price_en.trim() || price_tr.trim();
+    const finalDescEn = description_en.trim() || description_tr.trim();
 
     // Default image if none selected
     const finalImage = image || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%230b0b1a" rx="10"/><circle cx="150" cy="100" r="40" fill="none" stroke="%238b5cf6" stroke-width="3"/><text x="50%25" y="105" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%2300f0ff">GÖRSEL YOK</text></svg>`;
@@ -169,17 +188,23 @@ export default function AdminPanel({
     if (editingProduct) {
       onEditProduct({
         id: editingProduct.id,
-        name,
-        price,
-        description,
+        name_tr: name_tr.trim(),
+        name_en: finalNameEn,
+        price_tr: price_tr.trim(),
+        price_en: finalPriceEn,
+        description_tr: description_tr.trim(),
+        description_en: finalDescEn,
         image: finalImage
       });
     } else {
       onAddProduct({
         id: Date.now().toString(),
-        name,
-        price,
-        description,
+        name_tr: name_tr.trim(),
+        name_en: finalNameEn,
+        price_tr: price_tr.trim(),
+        price_en: finalPriceEn,
+        description_tr: description_tr.trim(),
+        description_en: finalDescEn,
         image: finalImage
       });
     }
@@ -448,11 +473,14 @@ export default function AdminPanel({
                           </div>
                         </td>
                         <td>
-                          <div className="client-name">{prod.name}</div>
-                          <div className="admin-product-desc-snippet">{prod.description}</div>
+                          <div className="client-name">{prod.name_tr}</div>
+                          <div className="text-dim font-mono" style={{ fontSize: "11px", opacity: 0.6 }}>EN: {prod.name_en}</div>
+                          <div className="admin-product-desc-snippet">TR: {prod.description_tr}</div>
+                          <div className="admin-product-desc-snippet" style={{ opacity: 0.5 }}>EN: {prod.description_en}</div>
                         </td>
                         <td>
-                          <div className="admin-product-price-val font-weight-bold text-primary">{prod.price}</div>
+                          <div className="admin-product-price-val font-weight-bold text-primary">{prod.price_tr}</div>
+                          <div className="text-dim font-mono" style={{ fontSize: "11px", opacity: 0.6 }}>EN: {prod.price_en}</div>
                         </td>
                         <td>
                           <div className="row-actions">
@@ -497,37 +525,71 @@ export default function AdminPanel({
             <form onSubmit={handleProductSubmit} className="request-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>{t.adminProductName}</label>
+                  <label>{t.adminProductNameTR}</label>
                   <input
                     type="text"
-                    value={productForm.name}
-                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    value={productForm.name_tr}
+                    onChange={(e) => setProductForm({ ...productForm, name_tr: e.target.value })}
                     required
-                    placeholder={lang === "tr" ? "Örn. MindAlfa Trading Bot" : "e.g. MindAlfa Trading Bot"}
+                    placeholder="Örn. MindAlfa Trading Bot"
                   />
                 </div>
                 
                 <div className="form-group">
-                  <label>{t.adminProductPrice}</label>
+                  <label>{t.adminProductNameEN}</label>
                   <input
                     type="text"
-                    value={productForm.price}
-                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                    required
-                    placeholder={t.adminPricePlaceholder}
+                    value={productForm.name_en}
+                    onChange={(e) => setProductForm({ ...productForm, name_en: e.target.value })}
+                    placeholder="e.g. MindAlfa Trading Bot"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>{t.adminProductDesc}</label>
-                <textarea
-                  rows="4"
-                  value={productForm.description}
-                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                  required
-                  placeholder={lang === "tr" ? "Ürün açıklaması..." : "Product description..."}
-                ></textarea>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>{t.adminProductPriceTR}</label>
+                  <input
+                    type="text"
+                    value={productForm.price_tr}
+                    onChange={(e) => setProductForm({ ...productForm, price_tr: e.target.value })}
+                    required
+                    placeholder="Örn. 500 $ veya 15.000 TL"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>{t.adminProductPriceEN}</label>
+                  <input
+                    type="text"
+                    value={productForm.price_en}
+                    onChange={(e) => setProductForm({ ...productForm, price_en: e.target.value })}
+                    placeholder="e.g. $500 or 15,000 TL"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>{t.adminProductDescTR}</label>
+                  <textarea
+                    rows="3"
+                    value={productForm.description_tr}
+                    onChange={(e) => setProductForm({ ...productForm, description_tr: e.target.value })}
+                    required
+                    placeholder="Ürün Türkçe açıklaması..."
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <label>{t.adminProductDescEN}</label>
+                  <textarea
+                    rows="3"
+                    value={productForm.description_en}
+                    onChange={(e) => setProductForm({ ...productForm, description_en: e.target.value })}
+                    placeholder="Product English description..."
+                  ></textarea>
+                </div>
               </div>
 
               <div className="form-group">
