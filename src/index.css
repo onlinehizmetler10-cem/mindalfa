@@ -1700,6 +1700,39 @@ button {
   }
 }
 
+/* Product Drag and Drop Styles */
+.product-drag-row {
+  cursor: grab;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+.product-drag-row:active {
+  cursor: grabbing;
+}
+.product-drag-row.dragging {
+  opacity: 0.4;
+  background: rgba(255, 255, 255, 0.05);
+}
+.product-drag-row.drag-over {
+  border-top: 2px solid var(--color-primary);
+  background: rgba(0, 240, 255, 0.03);
+}
+.drag-handle-cell {
+  width: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
+.drag-handle-icon {
+  color: var(--text-gray);
+  font-size: 16px;
+  cursor: grab;
+  user-select: none;
+  transition: var(--transition);
+}
+.product-drag-row:hover .drag-handle-icon {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
 
 
 

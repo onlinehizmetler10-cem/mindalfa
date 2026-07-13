@@ -227,6 +227,7 @@ export default function App() {
             onAddProduct={handleAddProduct}
             onEditProduct={handleEditProduct}
             onDeleteProduct={handleDeleteProduct}
+            onReorderProducts={saveProducts}
             onBack={() => {
               setView("landing");
               setIsAdminLoggedIn(false); // Reset login status for demonstration

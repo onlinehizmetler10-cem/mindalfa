@@ -8,12 +8,17 @@ export default function AdminPanel({
   onAddProduct, 
   onEditProduct, 
   onDeleteProduct, 
+  onReorderProducts,
   onBack, 
   lang, 
   t 
 }) {
   const [activeTab, setActiveTab] = useState("requests"); // "requests" or "products"
   const [selectedRequest, setSelectedRequest] = useState(null);
+  
+  // Drag and Drop reordering states
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   
   // Product form states
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -25,6 +30,38 @@ export default function AdminPanel({
     image: ""
   });
   const [productError, setProductError] = useState("");
+
+  // Drag and drop event handlers
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+  };
+
+  const handleDragEnter = (e, index) => {
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const reorderedList = [...products];
+    const [removed] = reorderedList.splice(draggedIndex, 1);
+    reorderedList.splice(index, 0, removed);
+
+    onReorderProducts(reorderedList);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   // Compute stats for requests
   const totalCount = requests.length;
@@ -383,6 +420,7 @@ export default function AdminPanel({
                 <table className="requests-table">
                   <thead>
                     <tr>
+                      <th style={{ width: "40px" }}></th>
                       <th>{t.adminProductImage}</th>
                       <th>{t.adminProductName}</th>
                       <th>{t.adminProductPrice}</th>
@@ -390,8 +428,20 @@ export default function AdminPanel({
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((prod) => (
-                      <tr key={prod.id}>
+                    {products.map((prod, index) => (
+                      <tr 
+                        key={prod.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragEnter={(e) => handleDragEnter(e, index)}
+                        onDrop={(e) => handleDrop(e, index)}
+                        onDragEnd={handleDragEnd}
+                        className={`product-drag-row ${draggedIndex === index ? 'dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
+                      >
+                        <td className="drag-handle-cell">
+                          <span className="drag-handle-icon" title={lang === "tr" ? "Sürükle" : "Drag"}>☰</span>
+                        </td>
                         <td>
                           <div className="admin-product-thumb-container">
                             <img src={prod.image} alt="" className="admin-product-thumb" />
