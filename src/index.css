@@ -1645,6 +1645,62 @@ button {
   }
 }
 
+/* Catalog Page Styles */
+.catalog-container {
+  padding-top: 140px; /* Leave space for sticky navbar */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.catalog-header {
+  margin-bottom: 50px;
+  position: relative;
+}
+.catalog-header h1 {
+  font-family: var(--font-brand);
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+.catalog-subtitle {
+  font-size: 16px;
+  color: var(--text-gray);
+  max-width: 600px;
+  line-height: 1.6;
+}
+.catalog-header .back-btn {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+.catalog-footer {
+  margin-top: auto;
+  padding-top: 60px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .catalog-container {
+    padding-top: 110px;
+  }
+  .catalog-header h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+  .catalog-subtitle {
+    font-size: 14px;
+  }
+}
+
+
 
 
 

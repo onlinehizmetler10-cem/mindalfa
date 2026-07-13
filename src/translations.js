@@ -95,7 +95,10 @@ export const translations = {
     adminProductActions: "İşlemler",
     adminSelectFile: "Görsel Seç",
     adminPricePlaceholder: "Örn. 500 $ veya 15.000 TL",
-    adminValidationProductError: "Lütfen ürün adı, açıklaması ve fiyatı alanlarını doldurun."
+    adminValidationProductError: "Lütfen ürün adı, açıklaması ve fiyatı alanlarını doldurun.",
+    btnAllProducts: "Tüm Ürünlerimizi Gör \u2192",
+    catalogTitle: "Tüm Ürünlerimiz",
+    catalogSubtitle: "Geliştirdiğimiz tüm lisanslı yazılım, robot ve yapay zeka çözümlerini inceleyin."
   },
   en: {
     brandName: "MINDALFA",
@@ -193,6 +196,9 @@ export const translations = {
     adminProductActions: "Actions",
     adminSelectFile: "Choose Image",
     adminPricePlaceholder: "e.g. $500 or 15,000 TL",
-    adminValidationProductError: "Please fill out product name, description, and price fields."
+    adminValidationProductError: "Please fill out product name, description, and price fields.",
+    btnAllProducts: "View All Products \u2192",
+    catalogTitle: "All Our Products",
+    catalogSubtitle: "Browse all of our licensed software, trading robots, and AI solutions."
   }
 };

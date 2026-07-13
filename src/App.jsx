@@ -3,6 +3,7 @@ import { translations } from "./translations";
 import LandingPage from "./components/LandingPage";
 import RequestForm from "./components/RequestForm";
 import AdminPanel from "./components/AdminPanel";
+import ProductsCatalog from "./components/ProductsCatalog";
 import logoImg from "./assets/logo.png";
 
 // Mock requests to prepopulate the admin dashboard with realistic data
@@ -215,73 +216,7 @@ export default function App() {
         </div>
       )}
 
-      {view === "landing" ? (
-        <>
-          {/* Landing Page Navbar */}
-          <nav className="navbar glass">
-            <div className="container nav-content">
-              <div className="logo" onClick={(e) => handleNavClick(e, "welcome")}>
-                <img src={logoImg} alt="MindAlfa Logo" className="logo-img" />
-                <span className="logo-text gradient-text">{t.brandName}</span>
-              </div>
-
-              <div className="nav-links">
-                <a href="#about" onClick={(e) => handleNavClick(e, "about")} className="nav-link">{t.navAbout}</a>
-                <a href="#services" onClick={(e) => handleNavClick(e, "services")} className="nav-link">{t.navServices}</a>
-                <a href="#products" onClick={(e) => handleNavClick(e, "products")} className="nav-link">{t.navProducts}</a>
-                <a href="#support" onClick={(e) => handleNavClick(e, "support")} className="nav-link">{t.navSupport}</a>
-              </div>
-              
-              <div className="nav-actions">
-                {/* Secret Admin Button */}
-                <button 
-                  className="nav-link-btn" 
-                  onClick={() => setView("admin")}
-                  title={lang === "tr" ? "Yönetici Paneline Git" : "Go to Admin Panel"}
-                >
-                  🔒 Admin Panel
-                </button>
-
-                {/* Language Switcher */}
-                <button 
-                  className="lang-btn" 
-                  onClick={() => setLang(lang === "tr" ? "en" : "tr")}
-                >
-                  🌐 {lang === "tr" ? "English" : "Türkçe"}
-                </button>
-                
-                {/* Submit Request Button in Top Right */}
-                <button 
-                  id="submit-request-btn"
-                  className="btn-primary" 
-                  onClick={() => { setDefaultFormDesc(""); setIsModalOpen(true); }}
-                >
-                  {t.ctaSubmitRequest}
-                </button>
-              </div>
-            </div>
-          </nav>
-
-          {/* Main Landing View */}
-          <LandingPage 
-            products={products}
-            onOpenRequest={() => { setDefaultFormDesc(""); setIsModalOpen(true); }} 
-            onOpenRequestWithProduct={handleOpenRequestWithProduct}
-            lang={lang} 
-            t={t} 
-          />
-
-          {/* Request Form Modal */}
-          <RequestForm 
-            isOpen={isModalOpen} 
-            onClose={() => { setIsModalOpen(false); setDefaultFormDesc(""); }} 
-            onSubmit={handleAddRequest} 
-            defaultDesc={defaultFormDesc}
-            lang={lang} 
-            t={t} 
-          />
-        </>
-      ) : (
+      {view === "admin" ? (
         /* Admin Dashboard View with Password Guard */
         isAdminLoggedIn ? (
           <AdminPanel 
@@ -345,6 +280,83 @@ export default function App() {
             </div>
           </div>
         )
+      ) : (
+        <>
+          {/* Landing Page Navbar */}
+          <nav className="navbar glass">
+            <div className="container nav-content">
+              <div className="logo" onClick={(e) => handleNavClick(e, "welcome")}>
+                <img src={logoImg} alt="MindAlfa Logo" className="logo-img" />
+                <span className="logo-text gradient-text">{t.brandName}</span>
+              </div>
+
+              <div className="nav-links">
+                <a href="#about" onClick={(e) => handleNavClick(e, "about")} className="nav-link">{t.navAbout}</a>
+                <a href="#services" onClick={(e) => handleNavClick(e, "services")} className="nav-link">{t.navServices}</a>
+                <a href="#products" onClick={(e) => handleNavClick(e, "products")} className="nav-link">{t.navProducts}</a>
+                <a href="#support" onClick={(e) => handleNavClick(e, "support")} className="nav-link">{t.navSupport}</a>
+              </div>
+              
+              <div className="nav-actions">
+                {/* Secret Admin Button */}
+                <button 
+                  className="nav-link-btn" 
+                  onClick={() => setView("admin")}
+                  title={lang === "tr" ? "Yönetici Paneline Git" : "Go to Admin Panel"}
+                >
+                  🔒 Admin Panel
+                </button>
+
+                {/* Language Switcher */}
+                <button 
+                  className="lang-btn" 
+                  onClick={() => setLang(lang === "tr" ? "en" : "tr")}
+                >
+                  🌐 {lang === "tr" ? "English" : "Türkçe"}
+                </button>
+                
+                {/* Submit Request Button in Top Right */}
+                <button 
+                  id="submit-request-btn"
+                  className="btn-primary" 
+                  onClick={() => { setDefaultFormDesc(""); setIsModalOpen(true); }}
+                >
+                  {t.ctaSubmitRequest}
+                </button>
+              </div>
+            </div>
+          </nav>
+
+          {/* Conditional page render based on view state */}
+          {view === "landing" ? (
+            <LandingPage 
+              products={products}
+              onOpenRequest={() => { setDefaultFormDesc(""); setIsModalOpen(true); }} 
+              onOpenRequestWithProduct={handleOpenRequestWithProduct}
+              onViewAllProducts={() => setView("products")}
+              lang={lang} 
+              t={t} 
+            />
+          ) : (
+            <ProductsCatalog 
+              products={products}
+              onOpenRequestWithProduct={handleOpenRequestWithProduct}
+              onBack={() => setView("landing")}
+              lang={lang}
+              t={t}
+            />
+          )}
+
+          {/* Request Form Modal */}
+          <RequestForm 
+            isOpen={isModalOpen} 
+            onClose={() => { setIsModalOpen(false); setDefaultFormDesc(""); }} 
+            onSubmit={handleAddRequest} 
+            defaultDesc={defaultFormDesc}
+            lang={lang} 
+            t={t} 
+          />
+        </>
       )}
     </div>
   );

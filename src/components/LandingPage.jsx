@@ -55,7 +55,7 @@ def get_ledger(company_id: int, db: Session = Depends(get_db)):
     return {"status": "success", "data": transactions}`
 ];
 
-export default function LandingPage({ onOpenRequest, products = [], onOpenRequestWithProduct, lang, t }) {
+export default function LandingPage({ onOpenRequest, products = [], onOpenRequestWithProduct, onViewAllProducts, lang, t }) {
   const [promptIdx, setPromptIdx] = useState(0);
   const [status, setStatus] = useState("idle"); // idle -> typing_prompt -> thinking -> writing_code -> done
   const [typedPrompt, setTypedPrompt] = useState("");
@@ -289,7 +289,7 @@ export default function LandingPage({ onOpenRequest, products = [], onOpenReques
               <p>{t.adminNoProducts}</p>
             </div>
           ) : (
-            products.map((product) => (
+            products.slice(0, 3).map((product) => (
               <div key={product.id} className="product-card glass">
                 <div className="product-image-container">
                   <img src={product.image} alt={product.name} className="product-image" />
@@ -311,6 +311,14 @@ export default function LandingPage({ onOpenRequest, products = [], onOpenReques
             ))
           )}
         </div>
+
+        {products.length > 0 && (
+          <div className="catalog-btn-container text-center" style={{ marginTop: "40px" }}>
+            <button className="btn-secondary" onClick={onViewAllProducts}>
+              {t.btnAllProducts}
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Support & Training Banner Section */}
