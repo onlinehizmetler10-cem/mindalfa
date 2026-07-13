@@ -4,9 +4,10 @@ import LandingPage from "./components/LandingPage";
 import RequestForm from "./components/RequestForm";
 import AdminPanel from "./components/AdminPanel";
 import ProductsCatalog from "./components/ProductsCatalog";
+import { supabase } from "./supabaseClient";
 import logoImg from "./assets/logo.png";
 
-// Mock requests to prepopulate the admin dashboard with realistic data
+// Mock requests to prepopulate if needed locally (not used for seeding requests to database to keep admin panel clean)
 const initialMockRequests = [
   {
     id: "1",
@@ -17,30 +18,10 @@ const initialMockRequests = [
     description: "Merhabalar, Binance ve Borsa İstanbul API'lerini kullanarak çalışacak, RSI ve MACD kesişimlerini takip eden bir al-sat robotu yaptırmak istiyoruz. Bulut tabanlı bir panel üzerinden kontrol edilebilmeli.",
     status: "new",
     date: "05.07.2026 14:15:30"
-  },
-  {
-    id: "2",
-    name: "Ayşe",
-    surname: "Kaya",
-    phone: "05324445566",
-    email: "ayse.kaya@finance.co",
-    description: "MetaTrader 5 üzerinde çalışacak ve hareketli ortalamaları (EMA) temel alan bir FX robotu (Expert Advisor) ihtiyacımız var. Zarar kes (SL) ve kar al (TP) seviyelerini dinamik olarak belirleyecek.",
-    status: "in_progress",
-    date: "04.07.2026 11:20:10"
-  },
-  {
-    id: "3",
-    name: "John",
-    surname: "Smith",
-    phone: "+1555019922",
-    email: "jsmith@techcorp.com",
-    description: "We need a custom lightweight accounting interface that syncs our daily invoices to Google Sheets and sends automatic reminders to clients whose payments are overdue.",
-    status: "completed",
-    date: "02.07.2026 09:05:44"
   }
 ];
 
-// Mock products to prepopulate the catalog with premium items
+// Mock products to automatically seed the database if it is empty
 const initialMockProducts = [
   {
     id: "p1",
@@ -80,7 +61,7 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [defaultFormDesc, setDefaultFormDesc] = useState("");
-  const [view, setView] = useState("landing"); // "landing" or "admin"
+  const [view, setView] = useState("landing"); // "landing", "products" or "admin"
   const [alertMessage, setAlertMessage] = useState("");
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
     return sessionStorage.getItem("mindalfa_admin_logged_in") === "true";
@@ -125,113 +106,219 @@ export default function App() {
     }
   };
 
-  // Load requests & products from localStorage
+  // Fetch Requests and Products from Supabase on mount
   useEffect(() => {
-    const saved = localStorage.getItem("mindalfa_requests");
-    if (saved) {
-      setRequests(JSON.parse(saved));
-    } else {
-      setRequests(initialMockRequests);
-      localStorage.setItem("mindalfa_requests", JSON.stringify(initialMockRequests));
-    }
-
-    const savedProds = localStorage.getItem("mindalfa_products");
-    if (savedProds) {
-      try {
-        const parsed = JSON.parse(savedProds);
-        // Check if any product has the old schema (has "name" instead of "name_tr")
-        const hasOldSchema = parsed.some(prod => prod.name !== undefined);
-        if (hasOldSchema) {
-          // Migrate old products to new schema
-          const migrated = parsed.map(prod => ({
-            id: prod.id,
-            name_tr: prod.name_tr || prod.name || "",
-            name_en: prod.name_en || prod.name || "",
-            price_tr: prod.price_tr || prod.price || "",
-            price_en: prod.price_en || prod.price || "",
-            description_tr: prod.description_tr || prod.description || "",
-            description_en: prod.description_en || prod.description || "",
-            image: prod.image || ""
-          }));
-          setProducts(migrated);
-          localStorage.setItem("mindalfa_products", JSON.stringify(migrated));
-        } else {
-          setProducts(parsed);
-        }
-      } catch (err) {
-        setProducts(initialMockProducts);
-        localStorage.setItem("mindalfa_products", JSON.stringify(initialMockProducts));
-      }
-    } else {
-      setProducts(initialMockProducts);
-      localStorage.setItem("mindalfa_products", JSON.stringify(initialMockProducts));
-    }
+    fetchRequests();
+    fetchProducts();
   }, []);
 
-  // Save requests to localStorage when updated
-  const saveRequests = (updatedList) => {
-    setRequests(updatedList);
-    localStorage.setItem("mindalfa_requests", JSON.stringify(updatedList));
+  const fetchRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setRequests(data || []);
+    } catch (err) {
+      console.error("Error fetching requests from Supabase:", err.message);
+    }
   };
 
-  // Save products to localStorage when updated
-  const saveProducts = (updatedList) => {
-    setProducts(updatedList);
-    localStorage.setItem("mindalfa_products", JSON.stringify(updatedList));
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      
+      if (error) throw error;
+
+      // If database has 0 products, seed it with the mock premium products
+      if (!data || data.length === 0) {
+        const seedData = initialMockProducts.map((p, index) => ({
+          name_tr: p.name_tr,
+          name_en: p.name_en,
+          price_tr: p.price_tr,
+          price_en: p.price_en,
+          description_tr: p.description_tr,
+          description_en: p.description_en,
+          image: p.image,
+          sort_order: index
+        }));
+
+        const { error: seedErr } = await supabase
+          .from("products")
+          .insert(seedData);
+
+        if (seedErr) throw seedErr;
+        
+        // Refetch fresh seeded products
+        const { data: seededProds } = await supabase
+          .from("products")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        
+        setProducts(seededProds || []);
+      } else {
+        setProducts(data);
+      }
+    } catch (err) {
+      console.error("Error fetching products from Supabase:", err.message);
+    }
   };
 
-  const handleAddRequest = (newRequest) => {
-    const updated = [newRequest, ...requests];
-    saveRequests(updated);
-    setIsModalOpen(false);
-    setDefaultFormDesc("");
-    
-    // Trigger custom success notification
-    setAlertMessage(t.successAlert);
-    setTimeout(() => setAlertMessage(""), 6000);
+  // Insert client request to database (and mail triggers implicitly through UI submit)
+  const handleAddRequest = async (newRequest) => {
+    try {
+      const { error } = await supabase
+        .from("requests")
+        .insert([
+          {
+            name: newRequest.name,
+            surname: newRequest.surname,
+            phone: newRequest.phone,
+            email: newRequest.email,
+            description: newRequest.description,
+            status: newRequest.status,
+            date: newRequest.date
+          }
+        ]);
+
+      if (error) throw error;
+      fetchRequests();
+      setIsModalOpen(false);
+      setDefaultFormDesc("");
+      
+      // Trigger success banner
+      setAlertMessage(t.successAlert);
+      setTimeout(() => setAlertMessage(""), 6000);
+    } catch (err) {
+      console.error("Error saving request to Supabase:", err.message);
+    }
   };
 
-  const handleUpdateStatus = (id, status) => {
-    const updated = requests.map(req => 
-      req.id === id ? { ...req, status } : req
-    );
-    saveRequests(updated);
+  const handleUpdateStatus = async (id, status) => {
+    try {
+      const { error } = await supabase
+        .from("requests")
+        .update({ status })
+        .eq("id", id);
+      
+      if (error) throw error;
+      fetchRequests();
+    } catch (err) {
+      console.error("Error updating request status:", err.message);
+    }
   };
 
-  const handleDeleteRequest = (id) => {
+  const handleDeleteRequest = async (id) => {
     const confirmDelete = window.confirm(
       lang === "tr" 
         ? "Bu talebi silmek istediğinize emin misiniz?" 
         : "Are you sure you want to delete this request?"
     );
     if (confirmDelete) {
-      const updated = requests.filter(req => req.id !== id);
-      saveRequests(updated);
+      try {
+        const { error } = await supabase
+          .from("requests")
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+        fetchRequests();
+      } catch (err) {
+        console.error("Error deleting request:", err.message);
+      }
     }
   };
 
-  // Product CRUD Handlers
-  const handleAddProduct = (newProd) => {
-    const updated = [newProd, ...products];
-    saveProducts(updated);
+  // Product CRUD database methods
+  const handleAddProduct = async (newProd) => {
+    try {
+      const maxOrder = products.length > 0 ? Math.max(...products.map(p => p.sort_order || 0)) : 0;
+      const { error } = await supabase
+        .from("products")
+        .insert([
+          {
+            name_tr: newProd.name_tr,
+            name_en: newProd.name_en,
+            price_tr: newProd.price_tr,
+            price_en: newProd.price_en,
+            description_tr: newProd.description_tr,
+            description_en: newProd.description_en,
+            image: newProd.image,
+            sort_order: maxOrder + 1
+          }
+        ]);
+
+      if (error) throw error;
+      fetchProducts();
+    } catch (err) {
+      console.error("Error adding product to Supabase:", err.message);
+    }
   };
 
-  const handleEditProduct = (updatedProd) => {
-    const updated = products.map(prod =>
-      prod.id === updatedProd.id ? updatedProd : prod
-    );
-    saveProducts(updated);
+  const handleEditProduct = async (updatedProd) => {
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update({
+          name_tr: updatedProd.name_tr,
+          name_en: updatedProd.name_en,
+          price_tr: updatedProd.price_tr,
+          price_en: updatedProd.price_en,
+          description_tr: updatedProd.description_tr,
+          description_en: updatedProd.description_en,
+          image: updatedProd.image
+        })
+        .eq("id", updatedProd.id);
+
+      if (error) throw error;
+      fetchProducts();
+    } catch (err) {
+      console.error("Error editing product in Supabase:", err.message);
+    }
   };
 
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = async (id) => {
     const confirmDelete = window.confirm(
       lang === "tr"
         ? "Bu ürünü satılık listesinden silmek istediğinize emin misiniz?"
         : "Are you sure you want to delete this product from sale?"
     );
     if (confirmDelete) {
-      const updated = products.filter(prod => prod.id !== id);
-      saveProducts(updated);
+      try {
+        const { error } = await supabase
+          .from("products")
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+        fetchProducts();
+      } catch (err) {
+        console.error("Error deleting product from Supabase:", err.message);
+      }
+    }
+  };
+
+  // Reorder products dynamically and write sequential orders back to Database
+  const saveProducts = async (updatedList) => {
+    // Optimistic UI update
+    setProducts(updatedList);
+
+    try {
+      // Loop update each product order index
+      for (let i = 0; i < updatedList.length; i++) {
+        await supabase
+          .from("products")
+          .update({ sort_order: i })
+          .eq("id", updatedList[i].id);
+      }
+      fetchProducts();
+    } catch (err) {
+      console.error("Error updating product sort order:", err.message);
     }
   };
 
